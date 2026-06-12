@@ -25,6 +25,8 @@
 load("TCGA_LUAD_WGCNA_RESULTS.RData")
 load("TCGA_LUAD_DESeq2_RESULTS.RData")
 
+set.seed(123)
+
 #---------------------------------------------------------
 # Extract Blue module lncRNAs
 #---------------------------------------------------------
