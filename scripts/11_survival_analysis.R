@@ -13,6 +13,7 @@
 #
 # Output:
 # TCGA_LUAD_SURVIVAL_RESULTS.RData
+# Kaplan-Meier survival plot
 #=========================================================
 
 library(DESeq2)
@@ -20,29 +21,43 @@ library(jsonlite)
 library(survival)
 library(survminer)
 
-# Load expression data
+#---------------------------------------------------------
+# Load DESeq2 expression data
+#---------------------------------------------------------
+
 load("TCGA_LUAD_DESeq2_RESULTS.RData")
 
-# Set TCGA folder path
+#---------------------------------------------------------
+# Load clinical data
+#---------------------------------------------------------
+
 TCGA <- "C:\\Users\\hp\\OneDrive\\Desktop\\gdc-client_2.3_Windows_x64"
 
-# Load clinical file
 clinical <- fromJSON(
   file.path(TCGA, "clinical.cart.2026-05-26.json")
 )
 
+#---------------------------------------------------------
 # Create VST expression matrix
+#---------------------------------------------------------
+
 vsd <- vst(dds, blind = FALSE)
 expr_mat <- assay(vsd)
 
-# Extract patient IDs from TCGA sample barcodes
+#---------------------------------------------------------
+# Extract patient IDs from sample barcodes
+#---------------------------------------------------------
+
 patient_ids <- substr(
   colnames(expr_mat),
   1,
   12
 )
 
+#---------------------------------------------------------
 # Extract AC135012.3 expression
+#---------------------------------------------------------
+
 ac_surv <- data.frame(
   patient_id = patient_ids,
   expression = as.numeric(
@@ -50,18 +65,29 @@ ac_surv <- data.frame(
   )
 )
 
-# Extract follow-up days from diagnoses
+#---------------------------------------------------------
+# Extract follow-up time from clinical data
+#---------------------------------------------------------
+
 followup_days <- sapply(
   clinical$diagnoses,
   function(x) {
+    
     if (length(x$days_to_last_follow_up) == 0) {
       return(NA)
     }
-    max(x$days_to_last_follow_up, na.rm = TRUE)
+    
+    max(
+      x$days_to_last_follow_up,
+      na.rm = TRUE
+    )
   }
 )
 
+#---------------------------------------------------------
 # Build survival clinical table
+#---------------------------------------------------------
+
 surv_clin2 <- data.frame(
   patient_id = clinical$submitter_id,
   vital_status = clinical$demographic$vital_status,
@@ -69,33 +95,45 @@ surv_clin2 <- data.frame(
   days_to_last_follow_up = followup_days
 )
 
-# Create overall survival time
+# Overall survival time:
+# Dead patients = days_to_death
+# Alive patients = days_to_last_follow_up
+
 surv_clin2$OS_time <- ifelse(
   surv_clin2$vital_status == "Dead",
   surv_clin2$days_to_death,
   surv_clin2$days_to_last_follow_up
 )
 
-# Create survival status
+# Survival status:
+# 1 = dead
+# 0 = alive
+
 surv_clin2$status <- ifelse(
   surv_clin2$vital_status == "Dead",
   1,
   0
 )
 
-# Merge expression with clinical survival data
+#---------------------------------------------------------
+# Merge expression and survival data
+#---------------------------------------------------------
+
 surv_data2 <- merge(
   ac_surv,
   surv_clin2,
   by = "patient_id"
 )
 
-# Remove samples with missing survival time
+# Remove missing survival times
 surv_data2 <- surv_data2[
   !is.na(surv_data2$OS_time),
 ]
 
+#---------------------------------------------------------
 # Divide patients into high and low expression groups
+#---------------------------------------------------------
+
 surv_data2$group <- ifelse(
   surv_data2$expression >
     median(surv_data2$expression, na.rm = TRUE),
@@ -105,7 +143,10 @@ surv_data2$group <- ifelse(
 
 table(surv_data2$group)
 
+#---------------------------------------------------------
 # Kaplan-Meier survival analysis
+#---------------------------------------------------------
+
 fit2 <- survfit(
   Surv(OS_time, status) ~ group,
   data = surv_data2
@@ -123,7 +164,10 @@ km_plot <- ggsurvplot(
 
 km_plot
 
+#---------------------------------------------------------
 # Save results
+#---------------------------------------------------------
+
 save(
   surv_clin2,
   surv_data2,
