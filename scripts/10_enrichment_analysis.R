@@ -4,64 +4,72 @@
 # Project: TCGA-LUAD-lncRNA-Analysis
 #
 # Description:
-# Performs GO Biological Process and KEGG pathway
-# enrichment analysis using protein-coding genes
-# co-expressed with AC135012.3.
+# Performs GO Biological Process and KEGG enrichment
+# analysis using protein-coding genes positively correlated
+# with AC135012.3.
 #
 # Input:
-# TCGA_LUAD_NETWORK_RESULTS.RData
+# TCGA_LUAD_AC1350123_RESULTS.RData
 #
 # Output:
-# GO_results.csv
+# GO_BP_results.csv
 # KEGG_results.csv
+# GO_KEGG_gene_conversion.csv
+# TCGA_LUAD_ENRICHMENT_RESULTS.RData
 #=========================================================
 
 library(clusterProfiler)
 library(org.Hs.eg.db)
+library(enrichplot)
+library(ggplot2)
 
-#---------------------------------------------------------
-# Load network genes
-#---------------------------------------------------------
+# Load AC135012.3 characterization results
+load("TCGA_LUAD_AC1350123_RESULTS.RData")
 
-load("TCGA_LUAD_NETWORK_RESULTS.RData")
+# Use the same broader protein-coding correlated gene set
+# generated from top100 positive correlations in Script 08
+gene_list <- unique(protein_genes$gene_name)
 
-genes <- unique(top20$gene_name)
+# Remove missing gene names
+gene_list <- gene_list[
+  !is.na(gene_list)
+]
 
-#---------------------------------------------------------
 # Convert gene symbols to Entrez IDs
-#---------------------------------------------------------
-
 gene_convert <- bitr(
-  genes,
+  gene_list,
   fromType = "SYMBOL",
   toType = "ENTREZID",
   OrgDb = org.Hs.eg.db
 )
 
-#---------------------------------------------------------
-# GO enrichment
-#---------------------------------------------------------
-
+# GO Biological Process enrichment
 ego_bp <- enrichGO(
   gene = gene_convert$ENTREZID,
   OrgDb = org.Hs.eg.db,
+  keyType = "ENTREZID",
   ont = "BP",
-  pAdjustMethod = "BH"
+  pAdjustMethod = "BH",
+  pvalueCutoff = 0.05,
+  qvalueCutoff = 0.05,
+  readable = TRUE
 )
 
-#---------------------------------------------------------
-# KEGG enrichment
-#---------------------------------------------------------
-
+# KEGG pathway enrichment
 ekegg <- enrichKEGG(
   gene = gene_convert$ENTREZID,
-  organism = "hsa"
+  organism = "hsa",
+  pvalueCutoff = 0.05
 )
 
-#---------------------------------------------------------
-# Save results
-#---------------------------------------------------------
+# Convert KEGG IDs to readable gene symbols
+ekegg_readable <- setReadable(
+  ekegg,
+  OrgDb = org.Hs.eg.db,
+  keyType = "ENTREZID"
+)
 
+# Save enrichment result tables
 write.csv(
   as.data.frame(ego_bp),
   "GO_BP_results.csv",
@@ -69,21 +77,66 @@ write.csv(
 )
 
 write.csv(
-  as.data.frame(ekegg),
+  as.data.frame(ekegg_readable),
   "KEGG_results.csv",
   row.names = FALSE
 )
 
-save(
-  ego_bp,
-  ekegg,
+write.csv(
   gene_convert,
-  file = "TCGA_LUAD_ENRICHMENT_RESULTS.RData"
+  "GO_KEGG_gene_conversion.csv",
+  row.names = FALSE
 )
 
-# Optional plots
-dotplot(ego_bp)
+# Save GO dotplot
+p_go_dot <- dotplot(
+  ego_bp,
+  showCategory = 15
+)
 
-barplot(ego_bp)
+ggsave(
+  "AC135012_GO_BP_dotplot_15terms.png",
+  plot = p_go_dot,
+  width = 14,
+  height = 10,
+  dpi = 300
+)
 
-dotplot(ekegg)
+# Save GO barplot
+p_go_bar <- barplot(
+  ego_bp,
+  showCategory = 15
+)
+
+ggsave(
+  "AC135012_GO_BP_barplot_15terms.png",
+  plot = p_go_bar,
+  width = 14,
+  height = 10,
+  dpi = 300
+)
+
+# Save KEGG dotplot
+p_kegg_dot <- dotplot(
+  ekegg_readable,
+  showCategory = 15
+)
+
+ggsave(
+  "AC135012_KEGG_dotplot.png",
+  plot = p_kegg_dot,
+  width = 12,
+  height = 8,
+  dpi = 300
+)
+
+# Save R objects
+save(
+  protein_genes,
+  gene_list,
+  gene_convert,
+  ego_bp,
+  ekegg,
+  ekegg_readable,
+  file = "TCGA_LUAD_ENRICHMENT_RESULTS.RData"
+)
