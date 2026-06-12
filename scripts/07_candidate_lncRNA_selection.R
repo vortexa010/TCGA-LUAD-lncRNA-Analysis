@@ -104,7 +104,21 @@ blue_negative_hubs <- subset(
 #---------------------------------------------------------
 # Final candidate hub lncRNAs
 #
-# 
+# Candidate hub lncRNAs were initially identified from
+# the blue WGCNA module based on:
+#
+# 1. High module membership (high kME)
+# 2. Significant differential expression
+# 3. Strong network connectivity
+#
+# The final 10 candidate lncRNAs were prioritized for
+# downstream characterization based on their hub status,
+# differential expression patterns, and co-expression
+# network properties.
+#
+# These candidate hub lncRNAs were subsequently used for
+# functional enrichment analysis, co-expression network
+# analysis, survival analysis, and biological interpretation.     
 #
 #---------------------------------------------------------
 #---------------------------------------------------------
