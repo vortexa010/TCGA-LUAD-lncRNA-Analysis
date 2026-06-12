@@ -21,6 +21,8 @@
 library(DESeq2)
 library(WGCNA)
 
+set.seed(123)
+
 # Allow multi-threading
 allowWGCNAThreads()
 
