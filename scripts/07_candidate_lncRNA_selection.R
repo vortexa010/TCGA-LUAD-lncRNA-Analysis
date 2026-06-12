@@ -101,6 +101,10 @@ blue_negative_hubs <- subset(
 
 #---------------------------------------------------------
 # Select final candidate lncRNAs
+#These lncRNAs were selected for downstream analysis
+# based on differential expression, WGCNA hub status,
+# module membership, and biological relevance after
+# manual review of the candidate list.
 #---------------------------------------------------------
 
 final_lncRNAs <- c(
