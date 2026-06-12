@@ -1,101 +1,90 @@
-#=========================================================
-# Script: 14_interpretation.R
-# Author: Vaishnavi Mangam
-# Project: TCGA-LUAD-lncRNA-Analysis
-#
-# Description:
-# Biological interpretation of the TCGA-LUAD analysis.
-# This script summarizes the major findings and serves
-# as the basis for manuscript preparation.
-#=========================================================
+# NOTE:
+# This script contains biological interpretation of the
+# computational analyses performed in Scripts 1-13.
+# No new analyses are performed here.
 
-#---------------------------------------------------------
-# Overall Project Summary
-#---------------------------------------------------------
 
-# TCGA-LUAD RNA-seq count data were downloaded from the
-# Genomic Data Commons (GDC) portal.
+# ============================================================
+# Script 14 : Biological Interpretation
+# TCGA-LUAD lncRNA Project
+# ============================================================
 
-# Differential expression analysis was performed using
-# DESeq2.
+# This script summarizes the biological findings obtained
+# from the previous analyses.
 
-# Long non-coding RNAs (lncRNAs) were extracted from the
-# annotated differentially expressed genes.
+# ------------------------------------------------------------
+# Differential expression analysis
+# ------------------------------------------------------------
 
-# WGCNA identified several co-expression modules, with
-# the Blue module showing strong biological relevance.
+# DESeq2 analysis identified thousands of significantly
+# dysregulated genes between LUAD tumor and normal tissues.
 
-# Hub lncRNAs from the Blue module were prioritized for
-# downstream investigation.
+# PCA, clustering, volcano plot and heatmap demonstrated
+# a clear separation between tumor and normal samples,
+# indicating major transcriptomic differences.
 
-# AC135012.3 was selected as the final candidate based
-# on differential expression, module membership and
-# biological relevance.
+# ------------------------------------------------------------
+# WGCNA analysis
+# ------------------------------------------------------------
 
-#---------------------------------------------------------
-# AC135012.3 Findings
-#---------------------------------------------------------
+# WGCNA identified several co-expression modules.
 
-# AC135012.3 is significantly downregulated in
-# TCGA-LUAD tumor samples.
+# The blue module showed strong enrichment for genes
+# that were downregulated in LUAD tumors.
 
-# Correlation analysis demonstrated strong positive
-# association with endothelial-related genes.
+# Therefore, this module may represent biological
+# processes associated with normal lung function.
 
-# Co-expression network analysis suggested that
-# AC135012.3 may participate in vascular and endothelial
-# biological processes.
+# ------------------------------------------------------------
+# Candidate lncRNA selection
+# ------------------------------------------------------------
 
-# GO Biological Process enrichment indicated enrichment
-# of angiogenesis and vascular development pathways.
+# Candidate hub lncRNAs were selected based on:
+# 1. High module membership (kME)
+# 2. Significant differential expression
+# 3. Strong network connectivity
 
-# KEGG pathway enrichment suggested involvement in
-# signaling pathways associated with tumor progression.
+# AC135012.3 was selected as one of the strongest
+# candidate hub lncRNAs for downstream analysis.
 
-#---------------------------------------------------------
-# Survival Analysis
-#---------------------------------------------------------
+# ------------------------------------------------------------
+# Functional characterization
+# ------------------------------------------------------------
 
-# Kaplan-Meier survival analysis demonstrated significant
-# survival separation between high and low AC135012.3
-# expression groups.
+# AC135012.3 showed strong positive correlation with
+# TEK, EDNRB, TMEM100, FOXF1, CA4 and other genes.
 
-# Patients with higher AC135012.3 expression exhibited
-# improved overall survival.
+# GO enrichment analysis suggested involvement in:
+# - endothelial differentiation
+# - vascular development
+# - blood circulation
+# - cell junction assembly
 
-#---------------------------------------------------------
-# Cox Regression
-#---------------------------------------------------------
+# ------------------------------------------------------------
+# Survival analysis
+# ------------------------------------------------------------
 
-# Univariate Cox proportional hazards regression did not
-# demonstrate statistically significant continuous
-# expression-associated risk.
+# Kaplan-Meier analysis showed significant survival
+# differences between high and low AC135012.3 expression
+# groups.
 
-# Therefore, AC135012.3 may have prognostic potential,
-# but additional validation in independent cohorts is
-# required.
+# Univariate Cox regression using continuous expression
+# was not statistically significant.
 
-#---------------------------------------------------------
-# External Validation
-#---------------------------------------------------------
+# This suggests that categorical expression stratification
+# may better capture the prognostic effect.
 
-# GEPIA2 analysis confirmed reduced AC135012.3 expression
-# in LUAD tumor tissue.
+# ------------------------------------------------------------
+# Overall conclusion
+# ------------------------------------------------------------
 
-# GEPIA2 survival analysis supported the Kaplan-Meier
-# findings obtained from TCGA.
+# AC135012.3 is a downregulated hub lncRNA from the
+# blue WGCNA module and is strongly co-expressed with
+# endothelial and vascular-related genes.
 
-# Positive correlations with endothelial-associated
-# genes further support the potential biological role of
-# AC135012.3.
+# These findings suggest that loss of AC135012.3 may
+# contribute to disruption of normal lung homeostasis
+# during LUAD progression.
 
-#---------------------------------------------------------
-# Overall Conclusion
-#---------------------------------------------------------
-
-# AC135012.3 represents a promising candidate lncRNA
-# associated with LUAD progression and patient prognosis.
-
-# Further experimental validation using qRT-PCR,
-# functional assays and independent clinical cohorts is
-# recommended to confirm its biological role.
+# Further experimental validation is required to confirm
+# its biological function and clinical utility.
