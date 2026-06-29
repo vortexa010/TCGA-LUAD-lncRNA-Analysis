@@ -21,7 +21,7 @@ The project integrates differential expression analysis, weighted gene co-expres
 
 # 📌 Current Project Status
 
-**Status:** 🟢 Active Research Project
+**Status:**  Active Research Project
 
 This project is currently being expanded toward a research publication.
 
